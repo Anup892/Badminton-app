@@ -7,8 +7,8 @@ let player1name = document.querySelector("#play1");
 let player2name = document.querySelector("#play2");
 let points1 = document.querySelector("#pts1");
 let points2 = document.querySelector("#pts2");
-let player1 = document.querySelector(".player1");
-let player2 = document.querySelector(".player2");
+let player1 = document.querySelector(".points1");
+let player2 = document.querySelector(".points2");
 
 let decre1 = document.querySelector(".decre1 i");
 let decre2 = document.querySelector(".decre2 i");
