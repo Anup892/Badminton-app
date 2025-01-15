@@ -177,7 +177,7 @@ function getScoreText(score) {
 
 
 // Player 1 Event Listener
-player1.addEventListener("click", () => {
+player1.addEventListener("touchstart", () => {
     let points = document.querySelector("#points")
 const win = { winpnt: parseInt(points.value)}
 
@@ -246,7 +246,7 @@ const win = { winpnt: parseInt(points.value)}
 });
 
 // Player 2 Event Listener
-player2.addEventListener("click", () => {
+player2.addEventListener("touchstart", () => {
     let points = document.querySelector("#points")
 const win = { winpnt: parseInt(points.value)}
 
