@@ -80,9 +80,11 @@ function overgame() {
     });
 }
 
+// Function to check if a set is complete
 function toCheckIfSetIsComplete() {
-    if (parseInt(total1.innerText) + parseInt(total2.innerText) == selectSets.value) {
-        overgame();
+    const setsToWin = parseInt(selectSets.value);
+    if (parseInt(total1.innerText) + parseInt(total2.innerText) === setsToWin) {
+        overgame(); // Trigger overGame when the total sets are complete
     }
 }
 
@@ -99,6 +101,8 @@ stop.addEventListener("click", () => {
     audio.pause();
 });
 
+// Edit player names
+
 editName.forEach(name => {
     name.disabled = true;
     name.addEventListener("click", () => {
@@ -106,12 +110,19 @@ editName.forEach(name => {
         editdiv.classList.add("edit");
         bdy.appendChild(editdiv);
 
-        editdiv.innerHTML = ' <form><input type="text" id="nameInput1" placeholder="Enter a player 1 name.."  required><input type="text" id="nameInput2" placeholder="Enter a player 2 name.." required><button id="added">Add</button> </form>';
+        editdiv.innerHTML = `
+            <form>
+                <input type="text" id="nameInput1" placeholder="Enter player 1 name.." required>
+                <input type="text" id="nameInput2" placeholder="Enter player 2 name.." required>
+                <button id="added">Add</button>
+            </form>`;
 
         let added = document.querySelector("#added");
         let nameInput1 = document.querySelector("#nameInput1");
         let nameInput2 = document.querySelector("#nameInput2");
+
         added.addEventListener("click", () => {
+            e.preventDefault();  // Prevent form submission
             if (nameInput1.value == "" || nameInput2.value == "") {
                 alert("Please fill the above field..");
             } else {
@@ -121,16 +132,14 @@ editName.forEach(name => {
     });
 });
 
-// Function to update the selected player's name and remove the edit div
-function addThis(nameInput1, nameInput2, editdiv) {
-    editdiv.remove(); // Remove the edit div after updating
 
-    // Get the value from the input field
-    let nameaayo1 = nameInput1.value;
-    let nameaayo2 = nameInput2.value;
-    player1name.innerText = nameaayo1;
-    player2name.innerText = nameaayo2;
+// Function to update the selected player's name and remove the edit div
+function addNames(name1, name2, editDiv) {
+    player1name.innerText = name1;
+    player2name.innerText = name2;
+    editDiv.remove();  // Remove the edit form after adding names
 }
+
 
 let voices = [];
 
@@ -157,135 +166,73 @@ function getScoreText(score) {
     return score === 0 ? "love" : score;
 }
 
-// Player 1 Event Listener
-player1.addEventListener("click", () => {
+// Generic function to handle both player events
+function handlePlayerClick(player, opponent, pointsElement, totalElement, player1Score, player2Score) {
     let points = document.querySelector("#points");
     const win = { winpnt: parseInt(points.value) };
 
-    let valueOfSets = selectSets.value;
     speechSynthesis.cancel();
-    let pnt1 = parseInt(points1.innerText);
-    points1.innerText = pnt1 + 1;
+
+    // Increment points for the clicked player
+    let currentPlayerScore = parseInt(pointsElement.innerText);
+    pointsElement.innerText = currentPlayerScore + 1;
 
     // Check if both players are one point away from winning
-    if (parseInt(player1.innerText) === win.winpnt - 1 && parseInt(player2.innerText) === win.winpnt - 1) {
+    if (parseInt(player1Score.innerText) === win.winpnt - 1 && parseInt(player2Score.innerText) === win.winpnt - 1) {
         win.winpnt = win.winpnt + 1;  // Increase win points by 1
     }
 
-    // Check if player1 has reached the winning point
-    if (parseInt(points1.innerText) === win.winpnt - 1) {
-        points1.style.color = "red";  // Highlight the player when they are about to win
+    // Highlight the player when they are about to win
+    if (parseInt(pointsElement.innerText) === win.winpnt - 1) {
+        pointsElement.style.color = "red";
     }
 
-    if (parseInt(points1.innerText) === win.winpnt) {
-        let total = parseInt(total1.innerText);
-        total1.innerText = total + 1;  // Increase total sets won by player1
+    // Check if player has reached the winning point
+    if (parseInt(pointsElement.innerText) === win.winpnt) {
+        let total = parseInt(totalElement.innerText);
+        totalElement.innerText = total + 1;  // Increase total sets won by the player
         newset();  // Start a new set
         toCheckIfSetIsComplete();  // Check if the set is complete
     }
 
-    // Check if player2 has reached the winning point
-    if (parseInt(points2.innerText) === win.winpnt) {
+    // Check if the opponent has reached the winning point
+    if (parseInt(opponent.innerText) === win.winpnt) {
         newset();  // Start a new set
-        let total = parseInt(total2.innerText);
-        total2.innerText = total + 1;  // Increase total sets won by player2
+        let total = parseInt(opponent.totalElement.innerText);
+        opponent.totalElement.innerText = total + 1;  // Increase total sets won by the opponent
         toCheckIfSetIsComplete();  // Check if the set is complete
     }
+
     // Get the score texts, converting 0 to "love"
-    let score1Text = getScoreText(pnt1 + 1);
-    let score2Text = getScoreText(parseInt(points2.innerText));
-    if (points1.innerText === points2.innerText) {
-        const selectedVoice = voices[document.getElementById('voiceSelect').value];
-        let speech1 = new SpeechSynthesisUtterance(`${score1Text}, "all"`);
-        speech1.voice = selectedVoice;  // Use the selected voice
-        speech1.pitch = 1;  // Pitch (0 to 2)
-        speech1.rate = 1.5;   // Rate (0.1 to 10)
+    let score1Text = getScoreText(parseInt(player1Score.innerText));
+    let score2Text = getScoreText(parseInt(player2Score.innerText));
 
-        // Start speaking the score
-        speechSynthesis.speak(speech1);
-    } else if (points1.innerText > points2.innerText) {
-        const selectedVoice = voices[document.getElementById('voiceSelect').value];
-        let speech1 = new SpeechSynthesisUtterance(`${score1Text}, ${score2Text}`);
-        speech1.voice = selectedVoice;  // Use the selected voice
-        speech1.pitch = 1;  // Pitch (0 to 2)
-        speech1.rate = 1.5;   // Rate (0.1 to 10)
-
-        // Start speaking the point getter who scored first (points1 first)
-        speechSynthesis.speak(speech1);
-    } else if (points1.innerText < points2.innerText) {
-        const selectedVoice = voices[document.getElementById('voiceSelect').value];
-        let speech1 = new SpeechSynthesisUtterance(`${score2Text}, ${score1Text}`);
-        speech1.voice = selectedVoice;  // Use the selected voice
-        speech1.pitch = 1;  // Pitch (0 to 2)
-        speech1.rate = 1.5;   // Rate (0.1 to 10)
-
-        speechSynthesis.speak(speech1);
+    // Use speech synthesis to announce the scores
+    let speechText = '';
+    if (player1Score.innerText === player2Score.innerText) {
+        speechText = `${score1Text}, all`;
+    } else if (parseInt(player1Score.innerText) > parseInt(player2Score.innerText)) {
+        speechText = `${score1Text}, ${score2Text}`;
+    } else {
+        speechText = `${score2Text}, ${score1Text}`;
     }
+
+    const selectedVoice = voices[document.getElementById('voiceSelect').value];
+    let speech = new SpeechSynthesisUtterance(speechText);
+    speech.voice = selectedVoice;  // Use the selected voice
+    speech.pitch = 1;  // Pitch (0 to 2)
+    speech.rate = 1.5;  // Rate (0.1 to 10)
+    speechSynthesis.speak(speech);
+}
+
+// Player 1 Event Listener
+player1.addEventListener("click", () => {
+    handlePlayerClick(player1, player2, points1, total1, points1, points2);
 });
 
 // Player 2 Event Listener
 player2.addEventListener("click", () => {
-    let points = document.querySelector("#points");
-    const win = { winpnt: parseInt(points.value) };
-
-    speechSynthesis.cancel();
-    let pnt2 = parseInt(points2.innerText);
-    points2.innerText = pnt2 + 1;
-
-    // Check if both players are one point away from winning
-    if (parseInt(player1.innerText) === win.winpnt - 1 && parseInt(player2.innerText) === win.winpnt - 1) {
-        win.winpnt = win.winpnt + 1;  // Increase win points by 1
-    }
-
-    // Check if player2 has reached the winning point
-    if (parseInt(points2.innerText) === win.winpnt - 1) {
-        points2.style.color = "red";  // Highlight the player when they are about to win
-    }
-
-    if (parseInt(points2.innerText) === win.winpnt) {
-        newset();  // Start a new set
-        let total = parseInt(total2.innerText);
-        total2.innerText = total + 1;  // Increase total sets won by player2
-        toCheckIfSetIsComplete();  // Check if the set is complete
-    }
-
-    // Check if player1 has reached the winning point
-    if (parseInt(points1.innerText) === win.winpnt) {
-        newset();  // Start a new set
-        let total = parseInt(total1.innerText);
-        total1.innerText = total + 1;  // Increase total sets won by player1
-        toCheckIfSetIsComplete();  // Check if the set is complete
-    }
-
-    // Get the score texts, converting 0 to "love"
-    let score1Text = getScoreText(parseInt(points1.innerText));
-    let score2Text = getScoreText(pnt2 + 1);
-
-    if (points2.innerText === points1.innerText) {
-        const selectedVoice = voices[document.getElementById('voiceSelect').value];
-        let speech = new SpeechSynthesisUtterance(`${score1Text}, "all"`);
-        speech.voice = selectedVoice;  // Use the selected voice
-        speech.pitch = 1;  // Pitch (0 to 2)
-        speech.rate = 1.5;  // Rate (0.1 to 10)
-
-        speechSynthesis.speak(speech);
-    } else if (points1.innerText > points2.innerText) {
-        const selectedVoice = voices[document.getElementById('voiceSelect').value];
-        let speech1 = new SpeechSynthesisUtterance(`${score1Text}, ${score2Text}`);
-        speech1.voice = selectedVoice;  // Use the selected voice
-        speech1.pitch = 1;  // Pitch (0 to 2)
-        speech1.rate = 1.5;  // Rate (0.1 to 10)
-
-        speechSynthesis.speak(speech1);
-    } else if (points1.innerText < points2.innerText) {
-        const selectedVoice = voices[document.getElementById('voiceSelect').value];
-        let speech1 = new SpeechSynthesisUtterance(`${score2Text}, ${score1Text}`);
-        speech1.voice = selectedVoice;  // Use the selected voice
-        speech1.pitch = 1;  // Pitch (0 to 2)
-        speech1.rate = 1.5;  // Rate (0.1 to 10)
-
-        speechSynthesis.speak(speech1);
-    }
+    handlePlayerClick(player2, player1, points2, total2, points2, points1);
 });
 
 
@@ -299,6 +246,7 @@ decre1.addEventListener("click", () => {
     }
 });
 
+
 decre2.addEventListener("click", () => {
     if (points2.innerText == 0) {
         alert("jpt kam nagara bhai...");
@@ -308,17 +256,19 @@ decre2.addEventListener("click", () => {
     }
 });
 
-lists.forEach(list => {
-    list.addEventListener("click", () => {
-        lists.forEach(item => {
-            item.style.borderBottom = "";
-        });
 
-        list.style.borderBottom = "2px solid white";
-        let text = list.innerText;
-        topic.innerText = text;
-    });
-});
+// lists.forEach(list => {
+//     list.addEventListener("click", () => {
+//         lists.forEach(item => {
+//             item.style.borderBottom = "";
+//         });
+
+//         list.style.borderBottom = "2px solid white";
+//         let text = list.innerText;
+//         topic.innerText = text;
+//     });
+// });
+
 
 btn.addEventListener("click", () => {
     addMatch();
