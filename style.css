@@ -14,6 +14,8 @@ html , body{
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    padding-top: 80px; /* Adjust this value based on the header height */
+    padding-bottom: 60px; 
 
 }
 header{
@@ -41,14 +43,17 @@ header{
     justify-content: center;
     align-items: center;
     position: relative;
+    padding-top: 80px; /* Adjust this value based on the header height */
+    padding-bottom: 60px; 
 }
 .main{
-    height: calc(100vh - 150px);
+    height: calc(100vh - 80px - 60px); 
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    overflow: auto;
 }
 #add{
     height: 30px;
@@ -428,3 +433,13 @@ table,tr,td{
     pointer-events: none; /* Prevents interaction */
   }
 
+  @media (max-width: 768px) {
+    body {
+        padding-top: 60px; /* Adjust for smaller screens */
+        padding-bottom: 50px; /* Adjust for smaller screens */
+    }
+
+    .main {
+        height: calc(100vh - 60px - 50px);
+    }
+}
