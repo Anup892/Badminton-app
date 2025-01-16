@@ -35,7 +35,7 @@ function newSetDialog() {
 
 // Match end dialog box
 function overGameDialog() {
-    const overGameBox = createDialogBox("Do you want to end this Match?", () => {
+    const overGameBox = createDialogBoxover("Do you want to end this Match?", () => {
         points1.innerText = points2.innerText = "0";
         total1.innerText = total2.innerText = "0";
         points1.style.color = points2.style.color = "white";
@@ -43,6 +43,28 @@ function overGameDialog() {
         window.location.reload();
     });
     bdy.appendChild(overGameBox);
+}
+
+function createDialogBoxover(message, onOkClick) {
+    const dialogBox = document.createElement("div");
+    dialogBox.classList.add("Newgame");
+    dialogBox.innerHTML = `
+        <h4>${message}</h4>
+        <div class='choose'>
+            <button id='cancel'>Cancel</button>
+            <button id='ok'>Ok</button>
+        </div>
+    `;
+    
+    const cancel = dialogBox.querySelector("#cancel");
+    const ok = dialogBox.querySelector("#ok");
+    
+    ok.addEventListener("click", () =>{
+        window.location.reload();
+    });
+    cancel.addEventListener("click", () => dialogBox.remove());
+    
+    return dialogBox;
 }
 
 // Utility function to create a dialog box
@@ -60,7 +82,13 @@ function createDialogBox(message, onOkClick) {
     const cancel = dialogBox.querySelector("#cancel");
     const ok = dialogBox.querySelector("#ok");
     
-    ok.addEventListener("click", onOkClick);
+    ok.addEventListener("click", () =>{
+        dialogBox.remove();
+        points2.innerText="0";
+        points1.innerText="0";
+        points1.style.color = "white";
+        points2.style.color = "white";
+    });
     cancel.addEventListener("click", () => dialogBox.remove());
     
     return dialogBox;
@@ -123,54 +151,99 @@ function getScoreText(score) {
     return score === 0 ? "love" : score;
 }
 
+// Ensure that the speech synthesis is only triggered when required and not too frequently.
+let voices = [];
+
+// Function to populate voices for speech synthesis
+function populateVoiceList() {
+    voices = speechSynthesis.getVoices();
+    const voiceSelect = document.getElementById('voiceSelect');
+    voiceSelect.innerHTML = ''; // Clear existing options
+
+    voices.forEach((voice, index) => {
+        const option = document.createElement('option');
+        option.textContent = voice.name + ' (' + voice.lang + ')';
+        option.value = index;
+        voiceSelect.appendChild(option);
+    });
+}
+
+speechSynthesis.onvoiceschanged = populateVoiceList;
+populateVoiceList(); // Populate voices on page load
+
+// Function to convert a score of 0 to "love"
+function getScoreText(score) {
+    return score === 0 ? "love" : score;
+}
+
 // Handle player point changes
 function handlePlayerClick(player, opponent, pointsElement, totalElement) {
-    const winPoint = parseInt(document.querySelector("#points").value);
+    const winPoint = parseInt(document.querySelector("#points").value);  // Win point threshold (e.g., 5)
+
+    // Increment the player's score
     let currentScore = parseInt(pointsElement.innerText);
     pointsElement.innerText = currentScore + 1;
 
-    // Check if both players are one point away from winning
+    // Check if both players are one point away from winning, adjust winPoint
     if (parseInt(player1.innerText) === winPoint - 1 && parseInt(player2.innerText) === winPoint - 1) {
-        winPoint++;
+        winPoint++; // Increase win point threshold if both players are at one point away
     }
 
     // Highlight the player who is about to win
     if (parseInt(pointsElement.innerText) === winPoint - 1) {
-        pointsElement.style.color = "red";
+        pointsElement.style.color = "red"; // Color the player red when one point away
     }
 
-    // Check if player has won the set
+    // Check if the current player has won the set
     if (parseInt(pointsElement.innerText) === winPoint) {
         let total = parseInt(totalElement.innerText);
-        totalElement.innerText = total + 1;
-        newSetDialog();
-        checkSetCompletion();
+        totalElement.innerText = total + 1;  // Increment total sets won
+        newSetDialog();  // Trigger new set dialog
+        checkSetCompletion();  // Check if the set is complete
     }
 
-    // Check if opponent has won the set
+    // Check if the opponent has won the set
     if (parseInt(opponent.innerText) === winPoint) {
-        let total = parseInt(opponent.totalElement.innerText);
-        opponent.totalElement.innerText = total + 1;
-        newSetDialog();
-        checkSetCompletion();
+        let opponentTotal = parseInt(opponent.totalElement.innerText);
+        opponent.totalElement.innerText = opponentTotal + 1;  // Increment total sets won for the opponent
+        newSetDialog();  // Trigger new set dialog
+        checkSetCompletion();  // Check if the set is complete
     }
 
-    // Announce the score using speech synthesis
+    // Get score texts to announce the score using speech synthesis
     const score1Text = getScoreText(parseInt(player1.innerText));
     const score2Text = getScoreText(parseInt(player2.innerText));
-    const speechText = (score1Text === score2Text) ? `${score1Text}, all` : `${score1Text}, ${score2Text}`;
 
+    // Construct speech text based on scores
+    let speechText = '';
+    if (score1Text === score2Text) {
+        speechText = `${score1Text}, all`;
+    } else if (parseInt(player1.innerText) > parseInt(player2.innerText)) {
+        speechText = `${score1Text}, ${score2Text}`;
+    } else {
+        speechText = `${score2Text}, ${score1Text}`;
+    }
+
+    // Select voice and initiate speech
     const selectedVoice = voices[document.getElementById('voiceSelect').value];
     const speech = new SpeechSynthesisUtterance(speechText);
-    speech.voice = selectedVoice;
-    speech.pitch = 1;
-    speech.rate = 1.5;
+    speech.voice = selectedVoice;  // Set the selected voice
+    speech.pitch = 1;  // Pitch of the speech
+    speech.rate = 1.5;  // Rate of the speech
     speechSynthesis.speak(speech);
 }
 
-// Player 1 and Player 2 Click Event
-player1.addEventListener("click", () => handlePlayerClick(player1, player2, points1, total1));
-player2.addEventListener("click", () => handlePlayerClick(player2, player1, points2, total2));
+// Player 1 Click Event
+player1.addEventListener("click", () => {
+    speechSynthesis.cancel()
+    handlePlayerClick(player1, player2, points1, total1);
+});
+
+// Player 2 Click Event
+player2.addEventListener("click", () => {
+    speechSynthesis.cancel()
+    handlePlayerClick(player2, player1, points2, total2);
+});
 
 // Decrease points functionality
 decre1.addEventListener("click", () => {
