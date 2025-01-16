@@ -223,6 +223,13 @@ function handlePlayerClick(player, opponent, pointsElement, totalElement) {
     } else {
         speechText = `${score2Text}, ${score1Text}`;
     }
+     // Select voice and initiate speech
+    const selectedVoice = voices[document.getElementById('voiceSelect').value];
+    const speech = new SpeechSynthesisUtterance(speechText);
+    speech.voice = selectedVoice;  // Set the selected voice
+    speech.pitch = 1;  // Pitch of the speech
+    speech.rate = 1.5;  // Rate of the speech
+    speechSynthesis.speak(speech);
 }
 
 // Player 1 Click Event
