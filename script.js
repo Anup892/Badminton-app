@@ -59,9 +59,7 @@ function createDialogBoxover(message, onOkClick) {
     const cancel = dialogBox.querySelector("#cancel");
     const ok = dialogBox.querySelector("#ok");
     
-    ok.addEventListener("click", () =>{
-        window.location.reload();
-    });
+    ok.addEventListener("click", () => window.location.reload());
     cancel.addEventListener("click", () => dialogBox.remove());
     
     return dialogBox;
@@ -82,10 +80,10 @@ function createDialogBox(message, onOkClick) {
     const cancel = dialogBox.querySelector("#cancel");
     const ok = dialogBox.querySelector("#ok");
     
-    ok.addEventListener("click", () =>{
+    ok.addEventListener("click", () => {
         dialogBox.remove();
-        points2.innerText="0";
-        points1.innerText="0";
+        points2.innerText = "0";
+        points1.innerText = "0";
         points1.style.color = "white";
         points2.style.color = "white";
     });
@@ -171,11 +169,6 @@ function populateVoiceList() {
 speechSynthesis.onvoiceschanged = populateVoiceList;
 populateVoiceList(); // Populate voices on page load
 
-// Function to convert a score of 0 to "love"
-function getScoreText(score) {
-    return score === 0 ? "love" : score;
-}
-
 // Handle player point changes
 function handlePlayerClick(player, opponent, pointsElement, totalElement) {
     const winPoint = parseInt(document.querySelector("#points").value);  // Win point threshold (e.g., 5)
@@ -202,14 +195,6 @@ function handlePlayerClick(player, opponent, pointsElement, totalElement) {
         checkSetCompletion();  // Check if the set is complete
     }
 
-    // Check if the opponent has won the set
-    if (parseInt(opponent.innerText) === winPoint) {
-        let opponentTotal = parseInt(opponent.totalElement.innerText);
-        opponent.totalElement.innerText = opponentTotal + 1;  // Increment total sets won for the opponent
-        newSetDialog();  // Trigger new set dialog
-        checkSetCompletion();  // Check if the set is complete
-    }
-
     // Get score texts to announce the score using speech synthesis
     const score1Text = getScoreText(parseInt(player1.innerText));
     const score2Text = getScoreText(parseInt(player2.innerText));
@@ -223,7 +208,8 @@ function handlePlayerClick(player, opponent, pointsElement, totalElement) {
     } else {
         speechText = `${score2Text}, ${score1Text}`;
     }
-     // Select voice and initiate speech
+
+    // Select voice and initiate speech
     const selectedVoice = voices[document.getElementById('voiceSelect').value];
     const speech = new SpeechSynthesisUtterance(speechText);
     speech.voice = selectedVoice;  // Set the selected voice
