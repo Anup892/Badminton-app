@@ -19,6 +19,27 @@ let stop = document.querySelector("#stop");
 let audio = new Audio('bgsong.mp3');
 let selectSets = document.querySelector("#sets");
 
+// Function for populating voices dropdown
+let voices = [];
+
+function populateVoiceList() {
+    voices = speechSynthesis.getVoices();
+    const voiceSelect = document.getElementById('voiceSelect');
+    voiceSelect.innerHTML = '';  // Clear existing options
+
+    voices.forEach((voice, index) => {
+        const option = document.createElement('option');
+        option.textContent = `${voice.name} (${voice.lang})`;
+        option.value = index;
+        voiceSelect.appendChild(option);
+    });
+}
+
+speechSynthesis.onvoiceschanged = populateVoiceList;
+populateVoiceList();
+
+
+
 // Function to start a new set
 function newSet() {
     let NewGameBox = document.createElement("div");
@@ -56,6 +77,7 @@ function toCheckIfSetIsComplete() {
         overGame(); // Trigger overGame when the total sets are complete
     }
 }
+
 // Function to handle end of the game
 function overGame() {
     let OvergameBox = document.createElement("div");
@@ -166,15 +188,18 @@ function updatePoints(currentPlayerPoints, otherPlayerPoints, currentTotal, othe
     }
 
     // Handle the voice announcement
-    announceScore(currentPlayerPoints, otherPlayerPoints);
+    announceScore();
 }
 
 // Function for voice announcement
-function announceScore(currentPlayerPoints, otherPlayerPoints) {
-    let score1 = getScoreText(parseInt(currentPlayerPoints.innerText));
-    let score2 = getScoreText(parseInt(otherPlayerPoints.innerText));
+function announceScore() {
+    let score1 = getScoreText(parseInt(points1.innerText));
+    let score2 = getScoreText(parseInt(points2.innerText));
+
+    // Get selected voice
     let selectedVoice = voices[document.getElementById('voiceSelect').value];
-    let speech = new SpeechSynthesisUtterance(`${score1}, ${score2}`);
+    
+    let speech = new SpeechSynthesisUtterance(`${score1}  ${score2}`);
     speech.voice = selectedVoice;
     speech.pitch = 1;
     speech.rate = 1.5;
@@ -239,22 +264,4 @@ lists.forEach(list => {
     });
 });
 
-// Function for populating voices dropdown
-let voices = [];
-
-function populateVoiceList() {
-    voices = speechSynthesis.getVoices();
-    const voiceSelect = document.getElementById('voiceSelect');
-    voiceSelect.innerHTML = '';  // Clear existing options
-
-    voices.forEach((voice, index) => {
-        const option = document.createElement('option');
-        option.textContent = `${voice.name} (${voice.lang})`;
-        option.value = index;
-        voiceSelect.appendChild(option);
-    });
-}
-
-speechSynthesis.onvoiceschanged = populateVoiceList;
-populateVoiceList();
 
