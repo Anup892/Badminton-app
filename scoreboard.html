@@ -3,136 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Badminton-app </title>
+    <title>Badminton App</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-<header>
 
-    <div class="section">
-        <div class="icons"><img src="icon3.png" alt=""></div>
-        <h1 id="topic">Scoreboard</h1>
-    </div>
+    <nav>
 
-</header>
-<div class="over">
+        <ul>
+         <a href="/Home/home.html"><li><img src="/images/home (1).png" alt=""><h4>Home</h4></li></a>
+         <a href="#" id="this"> <li><img src="/images/list.png" alt=""><h4>Standings</h4></li></a>
+         <a href="/Matches/matches.html"><li><img src="/images/calendar (1).png" alt=""><h4>Matches</h4></li></a>
+         <a href="#"><li><img src="/images/user.png" alt=""><h4>Counter</h4></li></a>
+        </ul>
+        
+      </nav>
 
-    <div class="main">
-        <div class="wrapper-div">
-            <div class="total-sets">
-                <label for="sets">Choose a no of sets:</label>
+<main class="main">
+    <div class="wrapper-div">
+        <!-- Set and Points Selection -->
+        <div class="total-sets">
+            <label for="sets">Choose number of sets:</label>
+            <select name="sets" id="sets">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
 
-<select name="sets" id="sets">
-  <option value="1">1</option>
-  <option value="2">2</option>
-  <option value="3">3</option>
-  <option value="4">4</option>
-</select>
+            <label for="points">Points per game:</label>
+            <select name="points" id="points">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+            </select>
+        </div>
 
-<label for="points">Points per game</label>
-
-<select name="points" id="points">
-  <option value="1">1</option>
-  <option value="2">2</option>
-  <option value="3">3</option>
-  <option value="4">4</option>
-  <option value="5">5</option>
-  <option value="6">6</option>
-  <option value="7">7</option>
-  <option value="8">8</option>
-  <option value="9">9</option>
-  <option value="10">10</option>
-  <option value="11">11</option>
-  <option value="12">12</option>
-  <option value="13">13</option>
-  <option value="14">14</option>
-  <option value="15">15</option>
-  <option value="16">16</option>
-  <option value="17">17</option>
-  <option value="18">18</option>
-  <option value="19">19</option>
-  <option value="20">20</option>
-  <option value="21">21</option>
-  <option value="22">22</option>
-  <option value="23">23</option>
-  <option value="24">24</option>
-  <option value="25">25</option>
-</select>
-            </div>
+        <!-- Set Wins Display -->
         <div class="first">
             <div class="win1">
-                <h4>Won Sets :- <span id="total1">0</span></h4>
+                <h4>Won Sets: <span id="total1">0</span></h4>
             </div>
             <div class="win2">
-                <h4>Won Sets :- <span id="total2">0</span></h4>
+                <h4>Won Sets: <span id="total2">0</span></h4>
             </div>
         </div>
 
-            <div class="point-system">
-                <div class="player1 ">
-                    <div class="points1">
-                        <p id="pts1">0</p>
-                    </div>
-        
-                </div>
-                <div class="player2">
-                    <div class="points2">
-                        <p id="pts2">0</p>
-                    </div>
-        
+        <!-- Player Points Display -->
+        <div class="point-system">
+            <div class="player1">
+                <div class="points1">
+                    <p id="pts1">0</p>
                 </div>
             </div>
-            
-            <div class="Names">
-                <div class="name">
-                    <i class="fa-solid fa-user"></i>&nbsp;&nbsp;&nbsp; <h1 id="play1">Player 1</h1>
+
+            <div class="player2">
+                <div class="points2">
+                    <p id="pts2">0</p>
                 </div>
-                
-                <div class="name">
-                    <i class="fa-solid fa-user"></i>&nbsp;&nbsp;&nbsp; <h1 id="play2">Player 2</h1>
-                </div>
-            </div>
-            <div class="last">
-                <span class="decre1">
-                    <i class="fa-solid fa-minus"></i>
-                </span>
-                <span id="edit">
-                    <i class="fa-regular fa-pen-to-square"></i>
-                </span>
-                <span class="decre2">
-                    <i class="fa-solid fa-minus"></i>
-                </span>
             </div>
         </div>
-        <button id="start">start</button>
-        <button id="stop">stop</button>
 
+        <!-- Player Names -->
+        <div class="Names">
+            <div class="name">
+                <i class="fa-solid fa-user"></i>&nbsp;&nbsp;&nbsp;<h1 id="play1">Player 1</h1>
+            </div>
+
+            <div class="name">
+                <i class="fa-solid fa-user"></i>&nbsp;&nbsp;&nbsp;<h1 id="play2">Player 2</h1>
+            </div>
+        </div>
+
+        <!-- Decrement & Edit Options -->
+        <div class="last">
+            <span class="decre1">
+                <i class="fa-solid fa-minus"></i>
+            </span>
+            <span id="edit">
+                <i class="fa-regular fa-pen-to-square"></i>
+            </span>
+            <span class="decre2">
+                <i class="fa-solid fa-minus"></i>
+            </span>
+        </div>
     </div>
-    
-    <select id="voiceSelect"></select>
-</div>
-<div class="nav">
+</main>
 
-    <ul>
-        <a href="index.html">
-            <div class="icons"><img src="icon1.png" alt=""></div>
-            <li>Home</li>
-        </a>
-        <a href="Data.html">
-            <div class="icons"><img src="icon2.png" alt=""></div>
-            <li>Tournament</li>
-        </a>
-        <a href="scoreboard.html">
-            <div class="icons"><img src="icon3.png" alt=""></div>
-            <li>Scoreboard</li>
-        </a>
-        <a href="#">
-           <div class="icons"><img src="icon4.png" alt=""></div>
-            <li>Dev</li>
-        </a>
-    </ul>
-</div>
+<!-- Voice Select Dropdown (potentially for speech synthesis) -->
+<select id="voiceSelect"></select>
 
 <script src="script.js"></script>
 
