@@ -11,9 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const total2 = document.querySelector("#total2");
     const selectSets = document.querySelector("#sets");
     const editName = document.querySelectorAll("#edit i");
-    const speechSelect = document.getElementById('voiceSelect');
 
-    // Function to handle point changes and announcing the score
+    // Function to handle point changes
     function handlePlayerClick(player, opponent, pointsElement, totalElement) {
         const winPoint = parseInt(document.querySelector("#points").value);
         
@@ -43,45 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             checkSetCompletion();  // Check if the set is complete
         }
-
-        // Construct speech text based on scores
-        const score1Text = getScoreText(parseInt(points1.innerText));
-        const score2Text = getScoreText(parseInt(points2.innerText));
-        let speechText = '';
-
-        if (score1Text === score2Text) {
-            speechText = `${score1Text}, all`;
-        } else if (parseInt(points1.innerText) > parseInt(points2.innerText)) {
-            speechText = `${score1Text}, ${score2Text}`;
-        } else {
-            speechText = `${score2Text}, ${score1Text}`;
-        }
-
-        // Select voice and initiate speech
-        // const selectedVoice = speechSynthesis.getVoices()[speechSelect.selectedIndex];
-        // const speech = new SpeechSynthesisUtterance(speechText);
-        // speech.voice = selectedVoice;  // Set the selected voice
-        // speech.pitch = 1;  // Pitch of the speech
-        // speech.rate = 1.5;  // Rate of the speech
-        // speechSynthesis.speak(speech);
     }
 
-    // Function to convert score of 0 to "love"
-    function getScoreText(score) {
-        return score === 0 ? "love" : score;
-    }
-
-    // Add event listeners for player score updates
-    if (player1 && player2) {
-        player1.addEventListener("click", () => {
-            speechSynthesis.cancel();  // Cancel any ongoing speech
-            handlePlayerClick(player1, player2, points1, total1);
-        });
-
-        player2.addEventListener("click", () => {
-            speechSynthesis.cancel();  // Cancel any ongoing speech
-            handlePlayerClick(player2, player1, points2, total2);
-        });
+    // Check if the match is over
+    function isMatchOver() {
+        const setsToWin = parseInt(selectSets.value);
+        return parseInt(total1.innerText) >= setsToWin || parseInt(total2.innerText) >= setsToWin;
     }
 
     // Score dialog box (set end)
@@ -92,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const newGameBox = createDialogBox("Do you want to end this set?", () => {
             points1.innerText = points2.innerText = "0";
             points1.style.color = points2.style.color = "white";
-            speechSynthesis.cancel();  // Cancel any ongoing speech
         });
         bdy.appendChild(newGameBox);
     }
@@ -101,19 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkSetCompletion() {
         const setsToWin = parseInt(selectSets.value);
         const totalSets = parseInt(total1.innerText) + parseInt(total2.innerText);
-        const total1Wins = parseInt(total1.innerText);
-        const total2Wins = parseInt(total2.innerText);
 
         // Check if either player has won the required number of sets
         if (totalSets === setsToWin) {
             endMatch();  // End the match if a player wins enough sets
         }
-    }
-
-    // Check if the match is over
-    function isMatchOver() {
-        const setsToWin = parseInt(selectSets.value);
-        return parseInt(total1.innerText) >= setsToWin || parseInt(total2.innerText) >= setsToWin;
     }
 
     // End the match and reset everything
@@ -124,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         bdy.appendChild(overGameBox);
     }
-    
+
     // Utility function to create a dialog box
     function createDialogBox(message, onOkClick) {
         const dialogBox = document.createElement("div");
@@ -149,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         return dialogBox;
     }
-    
 
     // Handle player names editing
     editName.forEach((name) => {
@@ -182,40 +138,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // // Populate voices for speech synthesis
-    // function populateVoiceList() {
-    //     const voiceSelect = speechSelect;
-    //     const voices = speechSynthesis.getVoices();
-    //     voiceSelect.innerHTML = ''; // Clear existing options
+    // For decrement if needed
+    const decre1 = document.querySelector(".decre1");
+    const decre2 = document.querySelector(".decre2");
 
-    //     voices.forEach((voice, index) => {
-    //         const option = document.createElement('option');
-    //         option.textContent = voice.name + ' (' + voice.lang + ')';
-    //         option.value = index;
-    //         voiceSelect.appendChild(option);
-    //     });
-    // }
+    decre1.addEventListener("click", () => {
+        if (points1.innerText == 0) {
+            alert("You cannot decrease from 0");
+        } else {
+            points1.innerText = parseInt(points1.innerText) - 1;
+        }
+    });
 
-    // speechSynthesis.onvoiceschanged = populateVoiceList;
-    // populateVoiceList();  // Populate voices on page load
-
-    //for decrement if needed
-const decre1 = document.querySelector(".decre1");
-const decre2 = document.querySelector(".decre2");
-
-decre1.addEventListener("click",()=>{
-    if(points1.innerText==0){
-        alert("You cannot decrease form 0")
-    }else{
-        points1.innerText = parseInt(points1.innerText) - 1;
-    }
-})
-decre2.addEventListener("click",()=>{
-    if(points2.innerText==0){
-        alert("You cannot decrease form 0")
-    }else{
-        points2.innerText = parseInt(points2.innerText) - 1;
-    }
-})
+    decre2.addEventListener("click", () => {
+        if (points2.innerText == 0) {
+            alert("You cannot decrease from 0");
+        } else {
+            points2.innerText = parseInt(points2.innerText) - 1;
+        }
+    });
 
 });
