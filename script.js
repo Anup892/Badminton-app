@@ -58,12 +58,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Select voice and initiate speech
-        const selectedVoice = speechSynthesis.getVoices()[speechSelect.selectedIndex];
-        const speech = new SpeechSynthesisUtterance(speechText);
-        speech.voice = selectedVoice;  // Set the selected voice
-        speech.pitch = 1;  // Pitch of the speech
-        speech.rate = 1.5;  // Rate of the speech
-        speechSynthesis.speak(speech);
+        // const selectedVoice = speechSynthesis.getVoices()[speechSelect.selectedIndex];
+        // const speech = new SpeechSynthesisUtterance(speechText);
+        // speech.voice = selectedVoice;  // Set the selected voice
+        // speech.pitch = 1;  // Pitch of the speech
+        // speech.rate = 1.5;  // Rate of the speech
+        // speechSynthesis.speak(speech);
     }
 
     // Function to convert score of 0 to "love"
@@ -182,22 +182,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Populate voices for speech synthesis
-    function populateVoiceList() {
-        const voiceSelect = speechSelect;
-        const voices = speechSynthesis.getVoices();
-        voiceSelect.innerHTML = ''; // Clear existing options
+    // // Populate voices for speech synthesis
+    // function populateVoiceList() {
+    //     const voiceSelect = speechSelect;
+    //     const voices = speechSynthesis.getVoices();
+    //     voiceSelect.innerHTML = ''; // Clear existing options
 
-        voices.forEach((voice, index) => {
-            const option = document.createElement('option');
-            option.textContent = voice.name + ' (' + voice.lang + ')';
-            option.value = index;
-            voiceSelect.appendChild(option);
-        });
-    }
+    //     voices.forEach((voice, index) => {
+    //         const option = document.createElement('option');
+    //         option.textContent = voice.name + ' (' + voice.lang + ')';
+    //         option.value = index;
+    //         voiceSelect.appendChild(option);
+    //     });
+    // }
 
-    speechSynthesis.onvoiceschanged = populateVoiceList;
-    populateVoiceList();  // Populate voices on page load
+    // speechSynthesis.onvoiceschanged = populateVoiceList;
+    // populateVoiceList();  // Populate voices on page load
 
     //for decrement if needed
 const decre1 = document.querySelector(".decre1");
