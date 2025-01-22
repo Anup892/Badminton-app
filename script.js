@@ -1,34 +1,22 @@
-// Wait for DOM to be fully loaded before executing the script
 document.addEventListener('DOMContentLoaded', () => {
     // DOM References
     const bdy = document.querySelector(".main");
-    const btn = document.querySelector("#add");
-    const lists = document.querySelectorAll(".nav a");
-    const topic = document.querySelector("#topic");
-    const editName = document.querySelectorAll("#edit i");
     const player1name = document.querySelector("#play1");
     const player2name = document.querySelector("#play2");
     const points1 = document.querySelector("#pts1");
     const points2 = document.querySelector("#pts2");
     const player1 = document.querySelector(".points1");
     const player2 = document.querySelector(".points2");
-
-    const decre1 = document.querySelector(".decre1 i");
-    const decre2 = document.querySelector(".decre2 i");
-
     const total1 = document.querySelector("#total1");
     const total2 = document.querySelector("#total2");
-
-    const start = document.querySelector("#start");
-    const stop = document.querySelector("#stop");
-    const audio = new Audio('bgsong.mp3');
-
     const selectSets = document.querySelector("#sets");
+    const editName = document.querySelectorAll("#edit i");
+    const speechSelect = document.getElementById('voiceSelect');
 
-    // Function for handling point changes and announcing the score
+    // Function to handle point changes and announcing the score
     function handlePlayerClick(player, opponent, pointsElement, totalElement) {
-        const winPoint = parseInt(document.querySelector("#points").value);  // Win point threshold (e.g., 5)
-
+        const winPoint = parseInt(document.querySelector("#points").value);
+        
         // Increment the player's score
         let currentScore = parseInt(pointsElement.innerText);
         pointsElement.innerText = currentScore + 1;
@@ -40,33 +28,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Highlight the player who is about to win
         if (parseInt(pointsElement.innerText) === winPoint - 1) {
-            pointsElement.style.color = "red"; // Color the player red when one point away
+            pointsElement.style.color = "red";
         }
 
         // Check if the current player has won the set
         if (parseInt(pointsElement.innerText) === winPoint) {
             let total = parseInt(totalElement.innerText);
             totalElement.innerText = total + 1;  // Increment total sets won
-            newSetDialog();  // Trigger new set dialog
+
+            // Only show "end set" dialog if the match is not over
+            if (!isMatchOver()) {
+                newSetDialog();  // Trigger new set dialog
+            }
+
             checkSetCompletion();  // Check if the set is complete
         }
 
-        // Get score texts to announce the score using speech synthesis
-        const score1Text = getScoreText(parseInt(player1.innerText));
-        const score2Text = getScoreText(parseInt(player2.innerText));
-
         // Construct speech text based on scores
+        const score1Text = getScoreText(parseInt(points1.innerText));
+        const score2Text = getScoreText(parseInt(points2.innerText));
         let speechText = '';
+
         if (score1Text === score2Text) {
             speechText = `${score1Text}, all`;
-        } else if (parseInt(player1.innerText) > parseInt(player2.innerText)) {
+        } else if (parseInt(points1.innerText) > parseInt(points2.innerText)) {
             speechText = `${score1Text}, ${score2Text}`;
         } else {
             speechText = `${score2Text}, ${score1Text}`;
         }
 
         // Select voice and initiate speech
-        const selectedVoice = voices[document.getElementById('voiceSelect').value];
+        const selectedVoice = speechSynthesis.getVoices()[speechSelect.selectedIndex];
         const speech = new SpeechSynthesisUtterance(speechText);
         speech.voice = selectedVoice;  // Set the selected voice
         speech.pitch = 1;  // Pitch of the speech
@@ -82,84 +74,62 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add event listeners for player score updates
     if (player1 && player2) {
         player1.addEventListener("click", () => {
-            speechSynthesis.cancel()
+            speechSynthesis.cancel();  // Cancel any ongoing speech
             handlePlayerClick(player1, player2, points1, total1);
         });
 
         player2.addEventListener("click", () => {
-            speechSynthesis.cancel()
+            speechSynthesis.cancel();  // Cancel any ongoing speech
             handlePlayerClick(player2, player1, points2, total2);
         });
     }
 
-    // Start background music
-    start.addEventListener("click", () => {
-        if (audio.paused) {
-            audio.volume = 0.1;
-            audio.loop = true;
-            audio.play();
-        }
-    });
-
-    // Stop background music
-    stop.addEventListener("click", () => audio.pause());
-
     // Score dialog box (set end)
     function newSetDialog() {
+        // Check if the match is over before showing the dialog
+        if (isMatchOver()) return;  // Skip the dialog if the match is already over
+
         const newGameBox = createDialogBox("Do you want to end this set?", () => {
             points1.innerText = points2.innerText = "0";
             points1.style.color = points2.style.color = "white";
-            speechSynthesis.cancel();
+            speechSynthesis.cancel();  // Cancel any ongoing speech
         });
         bdy.appendChild(newGameBox);
     }
 
-    // Check if the set is complete
+    // Check if the set is complete and if a player has won enough sets to end the match
     function checkSetCompletion() {
         const setsToWin = parseInt(selectSets.value);
         const totalSets = parseInt(total1.innerText) + parseInt(total2.innerText);
+        const total1Wins = parseInt(total1.innerText);
+        const total2Wins = parseInt(total2.innerText);
+
+        // Check if either player has won the required number of sets
         if (totalSets === setsToWin) {
-            overGameDialog();  // Show match end dialog
+            endMatch();  // End the match if a player wins enough sets
         }
     }
 
-    // Dialog box for match end
-    function overGameDialog() {
-        const overGameBox = createDialogBoxover("Do you want to end this Match?", () => {
-            points1.innerText = points2.innerText = "0";
-            total1.innerText = total2.innerText = "0";
-            points1.style.color = points2.style.color = "white";
-            speechSynthesis.cancel();
-            window.location.reload();
+    // Check if the match is over
+    function isMatchOver() {
+        const setsToWin = parseInt(selectSets.value);
+        return parseInt(total1.innerText) >= setsToWin || parseInt(total2.innerText) >= setsToWin;
+    }
+
+    // End the match and reset everything
+    function endMatch() {
+        const overGameBox = createDialogBox(`Match Over! Do you want to restart?`, () => {
+            // Reload the page to restart the game
+            location.reload(); 
         });
         bdy.appendChild(overGameBox);
     }
-
-    function createDialogBoxover(message, onOkClick) {
-        const dialogBox = document.createElement("div");
-        dialogBox.classList.add("Newgame");
-        dialogBox.innerHTML = `
-            <h4>${message}</h4>
-            <div class='choose'>
-                <button id='cancel'>Cancel</button>
-                <button id='ok'>Ok</button>
-            </div>
-        `;
-        
-        const cancel = dialogBox.querySelector("#cancel");
-        const ok = dialogBox.querySelector("#ok");
-        
-        ok.addEventListener("click", () => window.location.reload());
-        cancel.addEventListener("click", () => dialogBox.remove());
-        
-        return dialogBox;
-    }
-
+    
     // Utility function to create a dialog box
     function createDialogBox(message, onOkClick) {
         const dialogBox = document.createElement("div");
         dialogBox.classList.add("Newgame");
-        dialogBox.innerHTML = `
+        dialogBox.innerHTML = ` 
             <h4>${message}</h4>
             <div class='choose'>
                 <button id='cancel'>Cancel</button>
@@ -171,16 +141,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const ok = dialogBox.querySelector("#ok");
         
         ok.addEventListener("click", () => {
-            dialogBox.remove();
-            points2.innerText = "0";
-            points1.innerText = "0";
-            points1.style.color = "white";
-            points2.style.color = "white";
+            onOkClick();  // Call the provided callback (which will reload the page)
+            dialogBox.remove();  // Remove the dialog after confirmation
         });
-        cancel.addEventListener("click", () => dialogBox.remove());
+    
+        cancel.addEventListener("click", () => dialogBox.remove());  // Close the dialog if cancel is clicked
         
         return dialogBox;
     }
+    
 
     // Handle player names editing
     editName.forEach((name) => {
@@ -214,10 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Populate voices for speech synthesis
-    let voices = [];
     function populateVoiceList() {
-        voices = speechSynthesis.getVoices();
-        const voiceSelect = document.getElementById('voiceSelect');
+        const voiceSelect = speechSelect;
+        const voices = speechSynthesis.getVoices();
         voiceSelect.innerHTML = ''; // Clear existing options
 
         voices.forEach((voice, index) => {
@@ -229,5 +197,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     speechSynthesis.onvoiceschanged = populateVoiceList;
-    populateVoiceList(); // Populate voices on page load
+    populateVoiceList();  // Populate voices on page load
+
+    //for decrement if needed
+const decre1 = document.querySelector(".decre1");
+const decre2 = document.querySelector(".decre2");
+
+decre1.addEventListener("click",()=>{
+    if(points1.innerText==0){
+        alert("You cannot decrease form 0")
+    }else{
+        points1.innerText = parseInt(points1.innerText) - 1;
+    }
+})
+decre2.addEventListener("click",()=>{
+    if(points2.innerText==0){
+        alert("You cannot decrease form 0")
+    }else{
+        points2.innerText = parseInt(points2.innerText) - 1;
+    }
+})
+
 });
